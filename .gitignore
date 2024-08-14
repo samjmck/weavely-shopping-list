@@ -1,0 +1,9 @@
+.idea/
+.vscode/
+node_modules/
+build/
+tmp/
+temp/
+.DS_Store
+backend/node_modules/
+frontend/node_modules/
