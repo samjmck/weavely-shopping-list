@@ -11,9 +11,61 @@ app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
+app.use((request, response, next) => {
+    // Allow any origin for now
+    response.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+});
+
+const eventsConnections: Response[] = [];
+
+function notifyAll( data: object) {
+    for (const connection of eventsConnections) {
+        connection.write(`data: ${JSON.stringify(data)}\n\n`);
+    }
+}
+
 let shoppingListId = 0;
 let shoppingListItemId = 0;
-const shoppingLists: ShoppingList[] = [];
+const shoppingLists: ShoppingList[] = [
+    {
+        id: shoppingListId++,
+        name: 'Groceries',
+        items: [
+            {
+                id: shoppingListItemId++,
+                name: 'Milk',
+                isPurchased: false
+            },
+            {
+                id: shoppingListItemId++,
+                name: 'Eggs',
+                isPurchased: false
+            },
+            {
+                id: shoppingListItemId++,
+                name: 'Bread',
+                isPurchased: false
+            }
+        ]
+    },
+    {
+        id: shoppingListId++,
+        name: 'Hardware store',
+        items: [
+            {
+                id: shoppingListItemId++,
+                name: 'Nails',
+                isPurchased: false
+            },
+            {
+                id: shoppingListItemId++,
+                name: 'Hammer',
+                isPurchased: false
+            }
+        ]
+    }
+];
 
 app.get('/shopping_lists', (request, response) => {
     response.json(shoppingLists);
@@ -40,6 +92,8 @@ app.post('/shopping_lists', express.json(), (request, response) => {
     }
     shoppingLists.push(shoppingList);
 
+    notifyAll(shoppingLists);
+
     response.status(201).json(shoppingList);
 });
 
@@ -47,6 +101,8 @@ app.delete('/shopping_lists/:id', (request, response) => {
     const id = parseInt(request.params.id);
 
     const index = shoppingLists.findIndex((shoppingList) => shoppingList.id === id);
+
+    notifyAll(shoppingLists);
 
     if (index !== -1) {
         shoppingLists.splice(index, 1);
@@ -63,6 +119,8 @@ app.post('/shopping_lists/:id/items/:itemId/purchased', express.json(), (request
 
     const shoppingList = shoppingLists.find((shoppingList) => shoppingList.id === id);
 
+    notifyAll(shoppingLists);
+
     if (shoppingList) {
         const shoppingListItem = shoppingList.items.find((shoppingListItem) => shoppingListItem.id === itemId);
 
@@ -75,4 +133,19 @@ app.post('/shopping_lists/:id/items/:itemId/purchased', express.json(), (request
     } else {
         response.status(404).json({ error: 'Shopping list not found' });
     }
+});
+
+app.get('/events', (request, response) => {
+    response.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive'
+    });
+
+    eventsConnections.push(response);
+
+    request.on('close', () => {
+        const index = eventsConnections.indexOf(response);
+        eventsConnections.splice(index, 1);
+    });
 });
