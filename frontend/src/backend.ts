@@ -37,7 +37,7 @@ export const useShoppingList = (id: number) => {
 		setShoppingList(shoppingLists.find((shoppingList) => shoppingList.id === id) || null);
 	}, [shoppingLists]);
 
-	return { shoppingList };
+	return shoppingList;
 };
 
 export async function getShoppingLists(): Promise<ShoppingList[]> {
@@ -49,6 +49,16 @@ export async function getShoppingLists(): Promise<ShoppingList[]> {
 export async function getShoppingList(id: number): Promise<ShoppingList | null> {
 	const shoppingLists = await getShoppingLists();
 	return shoppingLists.find((shoppingList) => shoppingList.id === id) || null;
+}
+
+export async function updateShoppingListItem(shoppingListId: number, itemId: number, isPurchased: boolean): Promise<void> {
+	await fetch(`http://localhost:3050/shopping_lists/${shoppingListId}/items/${itemId}/purchased`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({ isPurchased })
+	});
 }
 
 export async function createShoppingList(shoppingList: ShoppingListBase): Promise<void> {

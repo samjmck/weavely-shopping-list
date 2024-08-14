@@ -1,11 +1,3 @@
-// textarea in the format of
-// Name
-// - item1
-// - item2
-// ...
-
-// parse the textarea into a ShoppingListBase object and call createShoppingList
-
 import { useState } from "react";
 import { ShoppingListBase } from "../types";
 import { createShoppingList } from "../backend";
@@ -17,7 +9,7 @@ export default function CreateShoppingList() {
 		const lines = text.split("\n");
 		const name = lines[0];
 		const items = lines.slice(1).map((line) => {
-			return { name, isPurchased: false };
+			return { name: line.slice(2), isPurchased: false };
 		});
 		const shoppingList = { name, items } as ShoppingListBase;
 		createShoppingList(shoppingList);
@@ -25,7 +17,7 @@ export default function CreateShoppingList() {
 	
 	return (
 		<div>
-			<textarea style={{width: "500px", height: "500px"}} value={text}></textarea>
+			<textarea style={{width: "500px", height: "500px"}} value={text} onChange={e => setText(e.target.value)}></textarea>
 			<button onClick={onClick}>Create</button>
 		</div>
 	);

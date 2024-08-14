@@ -104,10 +104,11 @@ app.delete('/shopping_lists/:id', (request, response) => {
 
     const index = shoppingLists.findIndex((shoppingList) => shoppingList.id === id);
 
-    notifyAll(shoppingLists);
-
     if (index !== -1) {
         shoppingLists.splice(index, 1);
+
+        notifyAll(shoppingLists);
+
         response.status(204).end();
     } else {
         response.status(404).json({ error: 'Shopping list not found' });
@@ -121,13 +122,14 @@ app.post('/shopping_lists/:id/items/:itemId/purchased', express.json(), (request
 
     const shoppingList = shoppingLists.find((shoppingList) => shoppingList.id === id);
 
-    notifyAll(shoppingLists);
-
     if (shoppingList) {
         const shoppingListItem = shoppingList.items.find((shoppingListItem) => shoppingListItem.id === itemId);
 
         if (shoppingListItem) {
             shoppingListItem.isPurchased = isPurchased;
+
+            notifyAll(shoppingLists);
+
             response.json(shoppingListItem);
         } else {
             response.status(404).json({ error: 'Shopping list item not found' });
