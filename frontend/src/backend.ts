@@ -7,6 +7,8 @@ export const useShoppingLists = () => {
 	const eventSourceRef = useRef<EventSource | null>(null);
 
 	useEffect(() => {
+		getShoppingLists().then(setShoppingLists);
+
 		const eventSource = new EventSource("http://localhost:3050/events");
 		eventSourceRef.current = eventSource;
 
@@ -25,6 +27,18 @@ export const useShoppingLists = () => {
 
 	return { shoppingLists };
 }
+
+// now use only 1 shopping list
+export const useShoppingList = (id: number) => {
+	const { shoppingLists } = useShoppingLists();
+	const [shoppingList, setShoppingList] = useState<ShoppingList | null>(null);
+
+	useEffect(() => {
+		setShoppingList(shoppingLists.find((shoppingList) => shoppingList.id === id) || null);
+	}, [shoppingLists]);
+
+	return { shoppingList };
+};
 
 export async function getShoppingLists(): Promise<ShoppingList[]> {
 	const response = await fetch('http://localhost:3050/shopping_lists');

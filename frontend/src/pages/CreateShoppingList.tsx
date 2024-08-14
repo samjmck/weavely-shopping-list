@@ -26,7 +26,7 @@ export default function CreateShoppingList() {
 	return (
 		<div>
 			<textarea style={{width: "500px", height: "500px"}} value={text}></textarea>
-			<button>Create</button>
+			<button onClick={onClick}>Create</button>
 		</div>
 	);
 }

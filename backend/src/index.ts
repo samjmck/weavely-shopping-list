@@ -14,6 +14,8 @@ app.listen(port, () => {
 app.use((request, response, next) => {
     // Allow any origin for now
     response.setHeader('Access-Control-Allow-Origin', '*');
+    response.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    response.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE');
     next();
 });
 
