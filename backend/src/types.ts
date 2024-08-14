@@ -1,10 +1,18 @@
-export type ShoppingListBase = {
+export type ShoppingListBaseItem = {
 	name: string;
-	items: string[];
+	isPurchased: boolean;
 }
 
-export type ShoppingList = ShoppingListBase & {
+export type ShoppingListItem = ShoppingListBaseItem & {
 	id: number;
 }
 
-export type CreateShoppingListInput = ShoppingListBase;
+export type ShoppingListBase = {
+	name: string;
+	items: ShoppingListBaseItem[];
+}
+
+export type ShoppingList = Omit<ShoppingListBase, 'items'> & {
+	id: number;
+	items: ShoppingListItem[];
+}
